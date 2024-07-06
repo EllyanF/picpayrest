@@ -6,23 +6,30 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public User create(@NotNull User user) {
-        validateUniqueConstraints(user);
-
         return userRepository.save(user);
     }
 
-    private void validateUniqueConstraints(@NotNull User user) {
-        if (userRepository.existsByDocument(user.getDocument())) throw new RuntimeException(
-                "Document already registered: " + user.getDocument()
-        );
-        if (userRepository.existsByEmail(user.getEmail())) throw new RuntimeException(
-                "Email already registered: " + user.getEmail()
-        );
+    public User findByDocument(String document) {
+        return userRepository.findByDocument(document).orElseThrow();
+    }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 }

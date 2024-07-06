@@ -3,7 +3,8 @@ package com.ellyanf.picpayrest.repository;
 import com.ellyanf.picpayrest.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface UserRepository extends JpaRepository<User, Long> {
-    boolean existsByDocument(String document);
-    boolean existsByEmail(String email);
+    Optional<User> findByDocument(String document);
 }

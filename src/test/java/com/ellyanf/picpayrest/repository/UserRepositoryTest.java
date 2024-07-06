@@ -2,10 +2,8 @@ package com.ellyanf.picpayrest.repository;
 
 import com.ellyanf.picpayrest.domain.User;
 import com.ellyanf.picpayrest.enums.UserType;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.math.BigDecimal;
@@ -13,13 +11,12 @@ import java.math.BigDecimal;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
     @Test
-    void testSave() {
+    void shouldSaveUserSuccessfully() {
         User user = new User();
         user.setName("Test");
         user.setDocument("111.111.111-11");
@@ -49,7 +46,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void shouldSetUserTypeToRetailer() {
+    void shouldSetUserTypeToMerchant() {
         User user = new User();
         user.setName("Test");
         user.setDocument("11.111.111/1111-11");

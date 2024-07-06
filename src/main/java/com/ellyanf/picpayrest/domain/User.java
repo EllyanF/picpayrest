@@ -3,6 +3,7 @@ package com.ellyanf.picpayrest.domain;
 import com.ellyanf.picpayrest.enums.UserType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -10,7 +11,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity(name = "users")
 @Table(name = "users")
@@ -18,11 +18,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"transactionsPaid", "transactionsReceived"})
+@EqualsAndHashCode(of = "id")
 public class User {
-    private static final String DOCUMENT_PATTERN = "^(\\d{2,3})\\.(\\d{3})\\.(\\d{3})(-\\d{2}|/\\d{4}-\\d{2})$";
-    private static final String CPF_PATTERN = "^(\\d{3}\\.){2}(\\d{3})-(\\d{2})$";
-    private static final String CNPJ_PATTERN = "^(\\d{2})(\\.\\d{3}){2}(/\\d{4}-\\d{2})$";
+    private static final String DOCUMENT_PATTERN = "^(\\d{2,3})\\.?(\\d{3})\\.?(\\d{3})(-?\\d{2}|/?\\d{4}-?\\d{2})$";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,29 +42,31 @@ public class User {
 
     @Column(unique = true)
     @NotNull
+    @Email
     private String email;
 
     @NotNull
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @OneToMany(mappedBy = "payer")
-    private List<Transaction> transactionsPaid;
-
-    @OneToMany(mappedBy = "payee")
-    private List<Transaction> transactionsReceived;
-
     @CreationTimestamp
-    private LocalDateTime localDateTime;
+    private LocalDateTime createdAt;
 
     @PrePersist
-    protected void identifyUserType() {
-        if (document.matches(CPF_PATTERN)) {
+    protected void prePersist() {
+        cleanDocument();
+        identifyUserType();
+    }
+
+    private void identifyUserType() {
+        if (document.matches("^[0-9]{11}$")) {
             userType = UserType.COMMON;
-        } else if (document.matches(CNPJ_PATTERN)) {
+        } else if (document.matches("^[0-9]{14}$")) {
             userType = UserType.MERCHANT;
-        } else {
-            throw new RuntimeException("Pattern Error. Could not define user type.");
         }
+    }
+
+    private void cleanDocument() {
+        document = document.replaceAll("[./-]", "");
     }
 }

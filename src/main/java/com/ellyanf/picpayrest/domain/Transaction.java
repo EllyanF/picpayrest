@@ -15,14 +15,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-@ToString
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    private BigDecimal value;
+    private BigDecimal amount;
 
     @ManyToOne
     @JoinColumn(name = "payer_id")
